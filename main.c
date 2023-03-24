@@ -111,7 +111,6 @@ void connectSC(){
 
 
 int main(){
-    
     printf("Iniciando servidor...\n\n");   
     connectSC();   
     printf("Termino el servidor...\n");
