@@ -47,11 +47,8 @@ void * funcion(void *param) { // funcion que obtiene los datos de la peticion de
     bool bandera=false;
 	read((int)*id, &peticion, sizeof(peticion));
 
-	printf("\nPeticion del Cliente: %s",peticion);
-    strtok(peticion, "\n");
     bandera = existeProductoASubastar (peticion, vectorProductos);
 	
-	fflush(stdout);
     if (bandera)
     {
         strcpy(respuesta,"El producto fue encontrado");
@@ -59,7 +56,9 @@ void * funcion(void *param) { // funcion que obtiene los datos de la peticion de
     else{
         strcpy(respuesta,"El producto NO fue encontrado");
     }
-   write((int)*id,&respuesta,sizeof(respuesta));
+	printf("\nPeticion del Cliente: %s",peticion);
+	fflush(stdout);
+    write((int)*id,&respuesta,sizeof(respuesta));
 }
 void connectSC(){
   
@@ -101,8 +100,8 @@ void connectSC(){
       id[0]=clientSocket;  
       
       //crea un nuevo hilo de ejecucion y lo lanza invocando a la funcion 'funcion' pasandole como parametro el descriptor asociado al cliente
-         Thread * hilo; 	
-      hilo=start_thread(funcion, (void*)&id[0]);
+    Thread * hilo; 	
+    hilo=start_thread(funcion, (void*)&id[0]);
 	
    }
 
