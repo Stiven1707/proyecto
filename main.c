@@ -41,12 +41,24 @@ void * funcion(void *param) { // funcion que obtiene los datos de la peticion de
     int * id;              //en el identificador del cliente obtenido mediante el accept
   	id = (int*)param;
 	char peticion[50], respuesta[50]; 
-        
+    char vectorProductos [] [MAXIMA_LONGITUD_CADENA] =
+    {"Primer computador MAC", "Codigo fuente de la WWWW", 
+    "Cuadro Guernica de Pablo Picasso", "Escultura de Botero"};
+    bool bandera=false;
 	read((int)*id, &peticion, sizeof(peticion));
-		
+
 	printf("\nPeticion del Cliente: %s",peticion);
-	fflush(stdout);	
-	strcpy(respuesta,"hola desde el servidor");
+    strtok(peticion, "\n");
+    bandera = existeProductoASubastar (peticion, vectorProductos);
+	
+	fflush(stdout);
+    if (bandera)
+    {
+        strcpy(respuesta,"El producto fue encontrado");
+    }
+    else{
+        strcpy(respuesta,"El producto NO fue encontrado");
+    }
    write((int)*id,&respuesta,sizeof(respuesta));
 }
 void connectSC(){
@@ -99,24 +111,7 @@ void connectSC(){
 
 
 int main(){
-    char vectorProductos [] [MAXIMA_LONGITUD_CADENA] =
-    {"Primer computador MAC", "Codigo fuente de la WWWW", 
-    "Cuadro Guernica de Pablo Picasso", "Escultura de Botero"};
-    char producto [MAXIMA_LONGITUD_CADENA];
-    bool bandera=false;
-    int cantidadCaracteres;
-    printf("Digite el nombre del producto a buscar: ");
-    fgets(producto, 50, stdin);
-    strtok(producto, "\n");
-    bandera = existeProductoASubastar (producto, vectorProductos);
-    if (bandera)
-    {
-        cantidadCaracteres = strlen(producto);
-        printf("El producto %s con una cantidad de caracteres %d fue encontrado \n", producto, cantidadCaracteres);
-    }
-    else{
-        printf("El producto %s no fue encontrado \n", producto);
-    }
+    
     printf("Iniciando servidor...\n\n");   
     connectSC();   
     printf("Termino el servidor...\n");
