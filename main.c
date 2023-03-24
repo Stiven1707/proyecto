@@ -1,3 +1,4 @@
+/******* S E R V I D O R   ********/
 #include<unistd.h>
 #include<stdio.h>
 #include<stdlib.h>
@@ -6,24 +7,24 @@
 #include<netinet/in.h>
 #include<string.h>
 #include <pthread.h>
-#include<stdbool.h>
+#include <stdlib.h>  
+#include <stdbool.h>
 #include "funciones.h"
 #define BACK_LOG 5 
 #define MAXIMA_LONGITUD_CADENA 50
 
+   int serverSocket = 0;
+   int status = 0, clientSocket = 0;   
+   struct sockaddr_in serverName, clientName;   
 
-int serverSocket = 0;
-int status = 0, clientSocket = 0;   
-struct sockaddr_in serverName, clientName;   
+  typedef void * (*thread_start_func)(void * arg);
 
-typedef void * (*thread_start_func)(void * arg);
-
-typedef struct {
+  typedef struct {
     pthread_t id;
     pthread_attr_t attr;
     thread_start_func start_func;
     void * arg;
-}Thread;
+  }Thread;
 
 //Funcion que permite crear un nuevo hilo de ejecucion
 Thread * start_thread(thread_start_func func, void * arg) {
@@ -37,29 +38,25 @@ Thread * start_thread(thread_start_func func, void * arg) {
   return t;
 }
 
-void * funcion(void *param) { // funcion que obtiene los datos de la peticion del cliente y escribe la respuesta 
-    int * id;              //en el identificador del cliente obtenido mediante el accept
-  	id = (int*)param;
-	char peticion[50], respuesta[50]; 
-    char vectorProductos [] [MAXIMA_LONGITUD_CADENA] =
-    {"Primer computador MAC", "Codigo fuente de la WWWW", 
-    "Cuadro Guernica de Pablo Picasso", "Escultura de Botero"};
-    bool bandera=false;
-	read((int)*id, &peticion, sizeof(peticion));
 
-    bandera = existeProductoASubastar (peticion, vectorProductos);
-	
-    if (bandera)
-    {
+void * funcion(void *param) { // funcion que obtiene los datos de la peticion del cliente y escribe la respuesta 
+    int * id;     //en el identificador del cliente obtenido mediante el accept
+    id = (int*)param;
+    char peticion[50], respuesta[50]; 
+
+    char vectorProductos[][MAXIMA_LONGITUD_CADENA] = {"Primer coutador MAC",   "Codigo fuente de la WWW",   "Cuadro Guernica de Pablo Picasso", "Escultura de Botero"};
+    bool bandera = false;
+    read((int)*id, &peticion, sizeof(peticion));
+    printf("\nPeticion del Cliente: %s",peticion);
+    bandera = existeProductoASubastar(peticion, vectorProductos);
+    if(bandera)
         strcpy(respuesta,"El producto fue encontrado");
-    }
-    else{
-        strcpy(respuesta,"El producto NO fue encontrado");
-    }
-	printf("\nPeticion del Cliente: %s",peticion);
-	fflush(stdout);
+    else
+        strcpy(respuesta,"El producto no fue encontrado");
+    fflush(stdout);
     write((int)*id,&respuesta,sizeof(respuesta));
 }
+
 void connectSC(){
   
    int portNum=5001;   
@@ -100,8 +97,8 @@ void connectSC(){
       id[0]=clientSocket;  
       
       //crea un nuevo hilo de ejecucion y lo lanza invocando a la funcion 'funcion' pasandole como parametro el descriptor asociado al cliente
-    Thread * hilo; 	
-    hilo=start_thread(funcion, (void*)&id[0]);
+         Thread * hilo; 	
+      hilo=start_thread(funcion, (void*)&id[0]);
 	
    }
 
@@ -109,9 +106,8 @@ void connectSC(){
 
 
 
-int main(){
-    printf("Iniciando servidor...\n\n");   
-    connectSC();   
-    printf("Termino el servidor...\n");
-    return 0;
+int main(int argc, char *argv[]) {
+   printf("Iniciando servidor...\n\n");   
+   connectSC();   
+   printf("Termino el servidor...\n");
 }
